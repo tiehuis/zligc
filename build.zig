@@ -1,4 +1,5 @@
 const std = @import("std");
+const mem = std.mem;
 
 const Builder = std.build.Builder;
 const ArrayList = std.ArrayList;
@@ -28,12 +29,12 @@ pub fn build(b: &Builder) void {
         // are embedded in each object. This is mentioned on the main issue.
 
         const impl_obj = b.addObject(impl, "src/" ++ impl);
+        const index = comptime ??mem.indexOfScalar(u8, impl, '.');
+        impl_obj.out_h_filename = b.fmt("{}.h", impl[0..index]);
+
         // Determine the appropriate output folder here. Note that the builder does not currently
         // have a default output folder configured so there will likely be some extra implementation
         // required in std/build.zig.
-
-        // TODO: Want to invoke ar here but we are getting a dynamic library instead?
-        // See objdump -f libc.a
         libc.addObject(impl_obj);
     }
 

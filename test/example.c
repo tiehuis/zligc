@@ -1,6 +1,4 @@
-// Re-define our headers and we should be able to use our libc in place of
-// the existing.
-#include <ctype.zig.h>
+#include <ctype.h>
 
 int main(void)
 {
