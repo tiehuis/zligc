@@ -108,14 +108,13 @@ export fn cbrtl(x: c_longdouble) c_longdouble {
 }
 
 
-// Exposed in builtin.o
-//export fn ceilf(x: f32) f32 {
-//    unreachable;
-//}
-//
-//export fn ceil(x: f64) f64 {
-//    unreachable;
-//}
+export fn ceilf(x: f32) f32 {
+    return math.ceil(x);
+}
+
+export fn ceil(x: f64) f64 {
+    return math.ceil(x);
+}
 
 export fn ceill(x: c_longdouble) c_longdouble {
     unreachable;
@@ -252,14 +251,13 @@ export fn fdiml(x: c_longdouble, y: c_longdouble) c_longdouble {
 }
 
 
-// Exposed in builtin.o
-//export fn floorf(x: f32) f32 {
-//    unreachable;
-//}
-//
-//export fn floor(x: f64) f64 {
-//    unreachable;
-//}
+export fn floorf(x: f32) f32 {
+    return math.floor(x);
+}
+
+export fn floor(x: f64) f64 {
+    return math.floor(x);
+}
 
 export fn floorl(x: c_longdouble) c_longdouble {
     unreachable;
@@ -305,14 +303,13 @@ export fn fminl(x: c_longdouble, y: c_longdouble) c_longdouble {
 }
 
 
-// Exposed in builtin.o
-//export fn fmodf(x: f32, y: f32) f32 {
-//    unreachable;
-//}
-//
-//export fn fmod(x: f64, y: f64) f64 {
-//    unreachable;
-//}
+export fn fmodf(x: f32, y: f32) f32 {
+    unreachable;
+}
+
+export fn fmod(x: f64, y: f64) f64 {
+    unreachable;
+}
 
 export fn fmodl(x: c_longdouble, y: c_longdouble) c_longdouble {
     unreachable;

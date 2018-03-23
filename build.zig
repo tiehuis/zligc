@@ -5,7 +5,7 @@ const ArrayList = std.ArrayList;
 
 pub fn build(b: &Builder) void {
     const mode = b.standardReleaseOptions();
-    const libc = b.addStaticLibrary("c", null);
+    const libc = b.addCStaticLibrary("c");
 
     // Implementations which will have object files and generated headers.
     const libc_impls = [][]const u8 {

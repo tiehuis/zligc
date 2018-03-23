@@ -6,19 +6,17 @@ const std = @import("std");
 
 // low-level memory functions
 
-// Exported by builtin.zig.
-//export fn memcpy(dest: ?&c_void, src: ?&const c_void, count: usize) ?&c_void {
-//    unreachable;
-//}
+export fn memcpy(dest: ?&c_void, src: ?&const c_void, count: usize) ?&c_void {
+    unreachable;
+}
 
 export fn memmove(dest: ?&c_void, src: ?&const c_void, count: usize) ?&c_void {
     unreachable;
 }
 
-// Exported by builtin.zig.
-//export fn memset(dest: ?&c_void, ch: c_int, count: usize) ?&c_void {
-//    unreachable;
-//}
+export fn memset(dest: ?&c_void, ch: c_int, count: usize) ?&c_void {
+    unreachable;
+}
 
 export fn memcmp(lhs: ?&const c_void, rhs: ?&const c_void, count: usize) c_int {
     unreachable;
