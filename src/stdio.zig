@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const cstr = std.cstr;
+const io = std.io;
 const File = std.os.File;
 
 var allocator = std.debug.global_allocator;
@@ -137,7 +138,10 @@ export fn fputs(str: ?&const u8, stream: ?&FILE) c_int {
 }
 
 export fn puts(str: ?&const u8) c_int {
-    unreachable;
+    var stdout_file = io.getStdOut() catch return -1;
+    stdout_file.write(cstr.toSliceConst(??str)) catch return -1;
+    stdout_file.write("\n") catch return -1;
+    return 0;
 }
 
 // NOTE: Omitted variadic printf functions for now. How does zig deal with these?

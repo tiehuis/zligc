@@ -1,23 +1,19 @@
 const std = @import("std");
 const mem = std.mem;
+const os = std.os;
 
 const Builder = std.build.Builder;
 const ArrayList = std.ArrayList;
 
-pub fn build(b: &Builder) void {
+pub fn build(b: &Builder) !void {
     const mode = b.standardReleaseOptions();
     const libc = b.addCStaticLibrary("c");
 
     // Implementations which will have object files and generated headers.
     const libc_impls = [][]const u8 {
-        "assert.zig",
         "ctype.zig",
         "float.zig",
-        "inttypes.zig",
         "math.zig",
-        "stdbool.zig",
-        "stddef.zig",
-        "stdint.zig",
         "stdio.zig",
         "stdlib.zig",
         "string.zig",
@@ -38,9 +34,23 @@ pub fn build(b: &Builder) void {
         libc.addObject(impl_obj);
     }
 
-    const libc_raw_headers = [][]const u8 {
-        // Copy to output folder
+    const raw_headers = [][]const u8 {
+        "assert.h",
+        "stdbool.h",
+        "stddef.h",
+        "stdint.h",
     };
+
+    inline for (raw_headers) |impl| {
+        const header = "src/" ++ impl;
+
+        var dest = ArrayList(u8).init(b.allocator);
+        try dest.appendSlice(b.cache_root);
+        try dest.appendSlice("/");
+        try dest.appendSlice(impl);
+
+        try os.copyFile(b.allocator, header, dest.toSliceConst());
+    }
 
     b.default_step.dependOn(&libc.step);
 }
