@@ -10,11 +10,12 @@ pub fn build(b: &Builder) void {
     const libc = b.addCStaticLibrary("c");
 
     const libc_impls = [][]const u8 {
-        "ctype.zig",
-        "math.zig",
-        "stdio.zig",
-        "stdlib.zig",
-        "string.zig",
+        "ctype",
+        "errno",
+        "math",
+        "stdio",
+        "stdlib",
+        "string",
     };
 
     inline for (libc_impls) |impl| {
@@ -22,7 +23,7 @@ pub fn build(b: &Builder) void {
         // here. This is why the libc.a file is so large, because the zig runtime/builtin details
         // are embedded in each object. This is mentioned on the main issue.
 
-        const impl_obj = b.addObject(impl, "src/" ++ impl);
+        const impl_obj = b.addObject(impl, "src/" ++ impl ++ ".zig");
 
         // Determine the appropriate output folder here. Note that the builder does not currently
         // have a default output folder configured so there will likely be some extra implementation
