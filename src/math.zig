@@ -318,13 +318,13 @@ export fn fmodl(x: c_longdouble, y: c_longdouble) c_longdouble {
 
 export fn frexpf(x: f32, exponent: &c_int) f32 {
     const r = math.frexp(x);
-    *exponent = r.exponent;
+    exponent.* = r.exponent;
     return r.significand;
 }
 
 export fn frexp(x: f64, exponent: &c_int) f64 {
     const r = math.frexp(x);
-    *exponent = r.exponent;
+    exponent.* = r.exponent;
     return r.significand;
 }
 
@@ -504,13 +504,13 @@ export fn lroundl(x: c_longdouble) c_long {
 
 export fn modff(x: f32, iptr: &f32) f32 {
     const r = math.modf(x);
-    *iptr = r.ipart;
+    iptr.* = r.ipart;
     return r.fpart;
 }
 
 export fn modf(x: f64, iptr: &f64) f64 {
     const r = math.modf(x);
-    *iptr = r.ipart;
+    iptr.* = r.ipart;
     return r.fpart;
 }
 

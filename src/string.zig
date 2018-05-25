@@ -2,8 +2,6 @@
 
 const std = @import("std");
 
-//export const NULL = @import("stddef.zig").NULL;
-
 // low-level memory functions
 
 export fn memcpy(dest: ?&c_void, src: ?&const c_void, count: usize) ?&c_void {

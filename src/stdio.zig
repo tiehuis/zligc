@@ -7,8 +7,6 @@ const File = std.os.File;
 
 var allocator = std.debug.global_allocator;
 
-// export const NULL = @import("stddef.zig").NULL;
-
 export const EOF = -1;
 
 export const SEEK_SET = 0;
@@ -37,7 +35,7 @@ extern const stderr: ?&const FILE;
 export fn fopen(filename: ?&const u8, mode: ?&const u8) ?&FILE {
     // TODO: Handle the mode argument
     var fd = allocator.create(File) catch return null;
-    *fd = File.openWrite(allocator, cstr.toSliceConst(??filename)) catch return null;
+    fd.* = File.openWrite(allocator, cstr.toSliceConst(??filename)) catch return null;
     return @ptrCast(?&FILE, fd);
 }
 
