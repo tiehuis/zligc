@@ -30,5 +30,6 @@ pub fn build(b: &Builder) void {
         libc.addObject(impl_obj);
     }
 
+    libc.setOutputPath("./lib/libc.a");
     b.default_step.dependOn(&libc.step);
 }
