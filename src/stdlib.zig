@@ -4,58 +4,58 @@
 
 // Old String -> Integer
 
-export fn atof(str: ?&const u8) f64 {
+export fn atof(str: ?*const u8) f64 {
     unreachable;
 }
 
-export fn atoi(str: ?&const u8) c_int {
+export fn atoi(str: ?*const u8) c_int {
     unreachable;
 }
 
-export fn atol(str: ?&const u8) c_long {
+export fn atol(str: ?*const u8) c_long {
     unreachable;
 }
 
-export fn atoll(str: ?&const u8) c_longlong {
+export fn atoll(str: ?*const u8) c_longlong {
     unreachable;
 }
 
 // C99 String -> Integer
 
 // C99
-export fn strtoll(str: ?&const u8, str_end: ?&u8, base: c_int) c_longlong {
+export fn strtoll(str: ?*const u8, str_end: ?*u8, base: c_int) c_longlong {
     unreachable;
 }
 
 // C99
-export fn strtoul(str: ?&const u8, str_end: ?&u8, base: c_int) c_ulong {
+export fn strtoul(str: ?*const u8, str_end: ?*u8, base: c_int) c_ulong {
     unreachable;
 }
 
 // C99
-export fn strtoull(str: ?&const u8, str_end: ?&u8, base: c_int) c_ulonglong {
+export fn strtoull(str: ?*const u8, str_end: ?*u8, base: c_int) c_ulonglong {
     unreachable;
 }
 
 // String -> Float
 
 // C99
-export fn strtof(str: ?&const u8, str_end: ?&u8) f32 {
+export fn strtof(str: ?*const u8, str_end: ?*u8) f32 {
     unreachable;
 }
 
 // C99
-export fn strtod(str: ?&const u8, str_end: ?&u8) f64 {
+export fn strtod(str: ?*const u8, str_end: ?*u8) f64 {
     unreachable;
 }
 
 // C99
-export fn strtold(str: ?&const u8, str_end: ?&u8) c_longdouble {
+export fn strtold(str: ?*const u8, str_end: ?*u8) c_longdouble {
     unreachable;
 }
 
 // C99
-export fn strtol(str: ?&const u8, str_end: ?&u8, base: c_int) c_long {
+export fn strtol(str: ?*const u8, str_end: ?*u8, base: c_int) c_long {
     unreachable;
 }
 
@@ -71,24 +71,24 @@ export fn srand(seed: c_uint) void {
 
 // Memory allocation
 
-export fn malloc(size: usize) ?&c_void {
+export fn malloc(size: usize) ?*c_void {
     unreachable;
 }
 
-export fn calloc(num: usize, size: usize) ?&c_void {
+export fn calloc(num: usize, size: usize) ?*c_void {
     unreachable;
 }
 
-export fn realloc(ptr: ?&c_void, new_size: usize) ?&c_void {
+export fn realloc(ptr: ?*c_void, new_size: usize) ?*c_void {
     unreachable;
 }
 
-export fn free(ptr: ?&c_void) void {
+export fn free(ptr: ?*c_void) void {
     unreachable;
 }
 
 // C11
-export fn aligned_alloc(alignment: usize, size: usize) ?&c_void {
+export fn aligned_alloc(alignment: usize, size: usize) ?*c_void {
     unreachable;
 }
 
@@ -119,16 +119,16 @@ export fn quick_exit(exit_code: c_int) noreturn {
 
 // Environment/Os
 
-export fn getenv(name: ?&const u8) ?&const u8 {
+export fn getenv(name: ?*const u8) ?*const u8 {
     unreachable;
 }
 
 // C11 - unimplemented in musl
-export fn getenv_s(len: ?&usize, value: ?&u8, valuesz: usize, name: ?&const u8) c_int {
+export fn getenv_s(len: ?*usize, value: ?*u8, valuesz: usize, name: ?*const u8) c_int {
     unreachable;
 }
 
-export fn system(command: ?&const u8) c_int {
+export fn system(command: ?*const u8) c_int {
     unreachable;
 }
 
@@ -162,7 +162,10 @@ export fn llabs(n: c_int) c_longlong {
 }
 
 fn DivType(comptime T: type) type {
-    return packed struct { quot: T, rem: T };
+    return packed struct {
+        quot: T,
+        rem: T,
+    };
 }
 
 export const div_t = DivType(c_int);

@@ -5,7 +5,7 @@ const os = std.os;
 const Builder = std.build.Builder;
 const ArrayList = std.ArrayList;
 
-pub fn build(b: &Builder) void {
+pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
     const libc = b.addCStaticLibrary("c");
 
