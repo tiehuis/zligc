@@ -32,10 +32,10 @@ extern const stderr: ?*const FILE;
 
 // File access
 
-export fn fopen(filename: ?*const u8, mode: ?*const u8) ?*FILE {
+export fn fopen(filename: [*]const u8, mode: [*]const u8) ?*FILE {
     // TODO: Handle the mode argument
     var fd = allocator.create(File) catch return null;
-    fd.* = File.openWrite(allocator, cstr.toSliceConst(??filename)) catch return null;
+    fd.* = File.openWrite(allocator, cstr.toSliceConst(filename)) catch return null;
     return @ptrCast(?*FILE, fd);
 }
 
@@ -135,16 +135,16 @@ export fn fputs(str: ?*const u8, stream: ?*FILE) c_int {
     unreachable;
 }
 
-export fn puts(str: ?*const u8) c_int {
+export fn puts(str: [*]const u8) c_int {
     var stdout_file = io.getStdOut() catch return -1;
-    stdout_file.write(cstr.toSliceConst(??str)) catch return -1;
+    stdout_file.write(cstr.toSliceConst(str)) catch return -1;
     stdout_file.write("\n") catch return -1;
     return 0;
 }
 
 // NOTE: Omitted variadic printf functions for now. How does zig deal with these?
 
-export fn perror(s: ?*const u8) void {
+export fn perror(s: [*]const u8) void {
     unreachable;
 }
 

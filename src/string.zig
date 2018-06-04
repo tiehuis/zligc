@@ -42,7 +42,7 @@ export fn strncat(dest: ?*u8, src: ?*const u8, count: usize) ?*u8 {
     unreachable;
 }
 
-export fn strcmp(lhs: *const u8, rhs: *const u8) c_int {
+export fn strcmp(lhs: [*]const u8, rhs: [*]const u8) c_int {
     // undefined if lhs and rhs are not null-terminated strings
     return c_int(std.cstr.cmp(lhs, rhs));
 }
@@ -81,7 +81,7 @@ export fn strtok(str: ?*u8, delim: ?*const u8) ?*u8 {
     unreachable;
 }
 
-export fn strlen(str: ?*const u8) usize {
+export fn strlen(str: ?[*]const u8) usize {
     // null str gives a value of 0
     return if (str) |ok| std.cstr.len(ok) else 0;
 }
