@@ -34,7 +34,7 @@ extern const stderr: ?*const FILE;
 
 export fn fopen(filename: [*]const u8, mode: [*]const u8) ?*FILE {
     // TODO: Handle the mode argument
-    var fd = allocator.create(File) catch return null;
+    var fd = allocator.create(File(undefined)) catch return null;
     fd.* = File.openWrite(allocator, cstr.toSliceConst(filename)) catch return null;
     return @ptrCast(?*FILE, fd);
 }
@@ -44,7 +44,7 @@ export fn freopen(filename: ?*const u8, mode: ?*const u8, stream: ?*FILE) ?*FILE
 }
 
 export fn fclose(stream: ?*FILE) c_int {
-    var fd = @ptrCast(*File, @alignCast(4, ??stream));
+    var fd = @ptrCast(*File, @alignCast(4, stream.?));
     fd.close();
     return 0;
 }

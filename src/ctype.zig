@@ -9,7 +9,7 @@ export fn isalnum(c: c_int) c_int {
 }
 
 export fn isalpha(c: c_int) c_int {
-    return u.toInt((c_uint(c) | 32) -% 'a' < 26);
+    return u.toInt((@intCast(c_uint, c) | 32) -% 'a' < 26);
 }
 
 export fn isblank(c: c_int) c_int {
@@ -17,23 +17,23 @@ export fn isblank(c: c_int) c_int {
 }
 
 export fn iscntrl(c: c_int) c_int {
-    return u.toInt(c_uint(c) < 0x20 or c == 0x7f);
+    return u.toInt(@intCast(c_uint, c) < 0x20 or c == 0x7f);
 }
 
 export fn isdigit(c: c_int) c_int {
-    return u.toInt(c_uint(c) -% '0' < 10);
+    return u.toInt(@intCast(c_uint, c) -% '0' < 10);
 }
 
 export fn isgraph(c: c_int) c_int {
-    return u.toInt(c_uint(c) -% 0x21 < 0x5e);
+    return u.toInt(@intCast(c_uint, c) -% 0x21 < 0x5e);
 }
 
 export fn islower(c: c_int) c_int {
-    return u.toInt(c_uint(c) -% 'a' < 26);
+    return u.toInt(@intCast(c_uint, c) -% 'a' < 26);
 }
 
 export fn isprint(c: c_int) c_int {
-    return u.toInt(c_uint(c) -% 0x20 < 0x5f);
+    return u.toInt(@intCast(c_uint, c) -% 0x20 < 0x5f);
 }
 
 export fn ispunct(c: c_int) c_int {
@@ -41,15 +41,15 @@ export fn ispunct(c: c_int) c_int {
 }
 
 export fn isspace(c: c_int) c_int {
-    return u.toInt(c == ' ' or c_uint(c) -% '\t' < 5);
+    return u.toInt(c == ' ' or @intCast(c_uint, c) -% '\t' < 5);
 }
 
 export fn isupper(c: c_int) c_int {
-    return u.toInt(c_uint(c) -% 'A' < 26);
+    return u.toInt(@intCast(c_uint, c) -% 'A' < 26);
 }
 
 export fn isxdigit(c: c_int) c_int {
-    return u.toInt(isdigit(c) != 0 or (c_uint(c) | 32) -% 'a' < 6);
+    return u.toInt(isdigit(c) != 0 or (@intCast(c_uint, c) | 32) -% 'a' < 6);
 }
 
 export fn tolower(c: c_int) c_int {
