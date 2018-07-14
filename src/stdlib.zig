@@ -1,7 +1,5 @@
 // Corresponds to <stdlib.h>
 
-// export const NULL = @import("stddef.zig").NULL;
-
 // Old String -> Integer
 
 export fn atof(str: ?*const u8) f64 {
@@ -185,13 +183,5 @@ export fn lldiv(x: c_longlong, y: c_longlong) lldiv_t {
 }
 
 // NOTE: Omitted multibyte functions
-
-// TODO: Zig does not export integer/float constants via the preprocessor. Would it be valid to
-// do this in all cases as opposed to explicitly typing them? We could force a symbol by typing the
-// value and rely on that. A bit opaque.
-export const EXIT_FAILURE = 1;
-export const EXIT_SUCCESS = 1;
-
-export const RAND_MAX = 0x7FFFFFFF;
 
 // NOTE: Ommitted posix/gnu extension functions
