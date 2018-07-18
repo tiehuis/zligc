@@ -1,6 +1,7 @@
 // Corresponds to <stdio.h>
 
 const std = @import("std");
+const builtin = @import("builtin");
 const cstr = std.cstr;
 const File = std.os.File;
 
@@ -10,22 +11,27 @@ const c = @cImport({
 
 // File access
 
-// TODO: Figure out how we want to define these.
-export var stdin: *File = undefined;
-export var stdout: *File = undefined;
-export var stderr: *File = undefined;
+var stdin_file: File = undefined;
+export var stdin = &stdin_file;
 
-var resolved = false;
+var stdout_file: File = undefined;
+export var stdout = &stdout_file;
+
+var stderr_file: File = undefined;
+export var stderr = &stderr_file;
 
 var allocator = std.debug.global_allocator;
 
-inline fn readOpaqueHandle(handle: ?*c.FILE) *File {
-    // resolve default streams as needed, TODO: need to be thread-safe.
-    if (!resolved) {
-        stdin = &(std.io.getStdIn() catch @panic("could not read stdin"));
-        stdout = &(std.io.getStdOut() catch @panic("could not read stdout"));
-        stderr = &(std.io.getStdErr() catch @panic("could not read stderr"));
-        resolved = true;
+var resolved: u8 = 0;
+
+fn readOpaqueHandle(handle: ?*c.FILE) *File {
+    // TODO: workaround since passing resolved directly to @cmpxchgStrong treats it as comptime
+    var non_comptime_resolved = &resolved;
+
+    if (@cmpxchgStrong(u8, non_comptime_resolved, 0, 1, builtin.AtomicOrder.SeqCst, builtin.AtomicOrder.SeqCst)) |_| {
+        stdin_file = std.io.getStdIn() catch unreachable;
+        stdout_file = std.io.getStdOut() catch unreachable;
+        stderr_file = std.io.getStdErr() catch unreachable;
     }
 
     return @ptrCast(*File, @alignCast(@alignOf(File), handle.?));
@@ -98,7 +104,6 @@ export fn fwrite(buffer: [*]const u8, size: usize, count: usize, stream: ?*c.FIL
 }
 
 export fn fgetc(stream: ?*c.FILE) c_int {
-    // TODO: Handle stdin/stderr stream lazily
     var fd = readOpaqueHandle(stream);
 
     var b: [1]u8 = undefined;

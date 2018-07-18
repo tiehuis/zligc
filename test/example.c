@@ -13,11 +13,17 @@ int main(void)
     // Will warn right now since we don't have an exportable c_char type
     puts("Hello, from Zig!");
 
-    //putchar('a');
+    int c;
+    while ((c = getchar())) {
+        putchar(c + 1);
+    }
 
-    //FILE *fd = fopen("test.txt", "r");
-    //fwrite("abcdefg", 4, 1, fd);
-    //fclose(fd);
+    //putchar('a');
+    //fputs("\nXXX\n", stderr);
+
+    FILE *fd = fopen("test.txt", "r");
+    fwrite("abcdefg", 4, 1, fd);
+    fclose(fd);
 
     return toupper(get_value());
 }

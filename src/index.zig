@@ -7,3 +7,11 @@ pub use @import("math.zig");
 pub use @import("stdio.zig");
 pub use @import("stdlib.zig");
 pub use @import("string.zig");
+
+const builtin = @import("builtin");
+const std = @import("std");
+
+pub fn panic(msg: []const u8, error_return_trace: ?*builtin.StackTrace) noreturn {
+    @setCold(true);
+    while (true) {}
+}

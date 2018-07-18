@@ -20,7 +20,10 @@ export fn memmove(dest: [*]u8, src: [*]const u8, count: usize) [*]u8 {
 }
 
 export fn memset(dest: [*]u8, ch: c_int, count: usize) [*]u8 {
-    @memset(dest, @intCast(u8, ch), count);
+    var i: usize = 0;
+    while (i < count) : (i += 1) {
+        dest[i] = @intCast(u8, ch);
+    }
     return dest;
 }
 

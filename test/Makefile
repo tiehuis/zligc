@@ -1,5 +1,5 @@
 all:
-	clang -Wall -Wextra -static -nostdlib \
+	clang -Wall -Wextra -static -nostdlib -g \
 		-I../include \
 		example.c \
 		../lib/libc.a # must be last
