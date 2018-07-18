@@ -24,14 +24,20 @@ var allocator = std.debug.global_allocator;
 
 var resolved: u8 = 0;
 
-fn readOpaqueHandle(handle: ?*c.FILE) *File {
+fn initStreams() void {
+    @setCold(true);
+
+    stdin_file = std.io.getStdIn() catch unreachable;
+    stdout_file = std.io.getStdOut() catch unreachable;
+    stderr_file = std.io.getStdErr() catch unreachable;
+}
+
+inline fn readOpaqueHandle(handle: ?*c.FILE) *File {
     // TODO: workaround since passing resolved directly to @cmpxchgStrong treats it as comptime
     var non_comptime_resolved = &resolved;
 
     if (@cmpxchgStrong(u8, non_comptime_resolved, 0, 1, builtin.AtomicOrder.SeqCst, builtin.AtomicOrder.SeqCst)) |_| {
-        stdin_file = std.io.getStdIn() catch unreachable;
-        stdout_file = std.io.getStdOut() catch unreachable;
-        stderr_file = std.io.getStdErr() catch unreachable;
+        @noInlineCall(initStreams);
     }
 
     return @ptrCast(*File, @alignCast(@alignOf(File), handle.?));
