@@ -22,6 +22,12 @@ int main(void)
 
     test_fprintf(stdout, "%s, hello 0x%x %d %c %p %u %f %e\n");
 
+    char buf[128];
+    char *c;
+    while ((c = fgets(buf, sizeof(buf), stdin)) != NULL) {
+        fputs(buf, stdout);
+    }
+
     /*
     //srand(0);
 

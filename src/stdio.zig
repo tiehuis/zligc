@@ -156,6 +156,29 @@ export fn puts(str: [*]const u8) c_int {
     return fputs(str, @ptrCast(?*c.FILE, stdout));
 }
 
+export fn fgets(s: [*]u8, size: c_int, stream: ?*c.FILE) ?[*]u8 {
+    var i: usize = 0;
+    while (i < @intCast(usize, size) - 1) : (i += 1) {
+        const ch = fgetc(stream);
+        switch (ch) {
+            c.EOF => break,
+
+            '\n' => {
+                s[i] = @intCast(u8, ch);
+                i += 1;
+                break;
+            },
+
+            else => {
+                s[i] = @intCast(u8, ch);
+            },
+        }
+    }
+    s[i] = 0;
+
+    return s;
+}
+
 // TODO: varargs support (access stack directly)
 // TODO: Write directly to stream instead of buffer
 export fn test_fprintf(stream: ?*c.FILE, noalias fmt: [*]const u8) c_int {
@@ -238,4 +261,3 @@ export fn test_fprintf(stream: ?*c.FILE, noalias fmt: [*]const u8) c_int {
 
     return 0;
 }
-

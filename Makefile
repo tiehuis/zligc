@@ -10,6 +10,7 @@ lib:
 
 example: lib
 	gcc -Wall -Wextra -static -nostdlib -g \
+		-fno-stack-protector \
 		-Iinclude \
 		example.c -o example \
 		lib/libc.a # must be last
