@@ -1,6 +1,19 @@
 // Corresponds to <math.h>
 
+const builtin = @import("builtin");
 const math = @import("std").math;
+
+comptime {
+    // These are implicitly defined when compiling tests.
+    if (!builtin.is_test) {
+        @export("ceil", ceil, builtin.GlobalLinkage.Strong);
+        @export("ceilf", ceilf, builtin.GlobalLinkage.Strong);
+        @export("floor", floor, builtin.GlobalLinkage.Strong);
+        @export("floorf", floorf, builtin.GlobalLinkage.Strong);
+        @export("sqrt", sqrt, builtin.GlobalLinkage.Strong);
+        @export("sqrtf", sqrtf, builtin.GlobalLinkage.Strong);
+    }
+}
 
 export fn acosf(x: f32) f32 {
     return math.acos(x);
@@ -66,11 +79,11 @@ export fn cbrt(x: f64) f64 {
     return math.cbrt(x);
 }
 
-export fn ceilf(x: f32) f32 {
+extern fn ceilf(x: f32) f32 {
     return math.ceil(x);
 }
 
-export fn ceil(x: f64) f64 {
+extern fn ceil(x: f64) f64 {
     return math.ceil(x);
 }
 
@@ -130,11 +143,11 @@ export fn fabs(x: f64) f64 {
     return math.fabs(x);
 }
 
-export fn floorf(x: f32) f32 {
+extern fn floorf(x: f32) f32 {
     return math.floor(x);
 }
 
-export fn floor(x: f64) f64 {
+extern fn floor(x: f64) f64 {
     return math.floor(x);
 }
 
@@ -258,11 +271,11 @@ export fn sinh(x: f64) f64 {
     return math.sinh(x);
 }
 
-export fn sqrtf(x: f32) f32 {
+extern fn sqrtf(x: f32) f32 {
     return math.sqrt(x);
 }
 
-export fn sqrt(x: f64) f64 {
+extern fn sqrt(x: f64) f64 {
     return math.sqrt(x);
 }
 

@@ -4,6 +4,15 @@ const builtin = @import("builtin");
 const std = @import("std");
 const assert = std.debug.assert;
 
+comptime {
+    // These are implicitly defined when compiling tests.
+    if (!builtin.is_test) {
+        @export("memcpy", memcpy, builtin.GlobalLinkage.Strong);
+        @export("memmove", memmove, builtin.GlobalLinkage.Strong);
+        @export("memset", memset, builtin.GlobalLinkage.Strong);
+    }
+}
+
 inline fn copyBackward(dest: [*]u8, src: [*]const u8, count: usize) [*]u8 {
     var ri: usize = 0;
     while (ri < count) : (ri += 1) {
@@ -19,15 +28,6 @@ inline fn copyForward(dest: [*]u8, src: [*]const u8, count: usize) [*]u8 {
         dest[i] = src[i];
     }
     return dest;
-}
-
-comptime {
-    // These are implicitly defined when compiling tests.
-    if (!builtin.is_test) {
-        @export("memcpy", memcpy, builtin.GlobalLinkage.Strong);
-        @export("memmove", memmove, builtin.GlobalLinkage.Strong);
-        @export("memset", memset, builtin.GlobalLinkage.Strong);
-    }
 }
 
 extern fn memcpy(noalias dest: [*]u8, noalias src: [*]const u8, count: usize) [*]u8 {
@@ -81,10 +81,10 @@ extern fn memset(dest: [*]u8, ch: c_int, count: usize) [*]u8 {
     return dest;
 }
 
-test "memset" {
+test "@memset" {
     var a = " " ** 7;
     _ = memset(a[0..].ptr, 'z', 7);
-    //assert(std.mem.eql(u8, a[0..7], "zzzzzzz"));
+    assert(std.mem.eql(u8, a[0..7], "zzzzzzz"));
 }
 
 export fn memcmp(lhs: [*]const u8, rhs: [*]const u8, count: usize) c_int {
@@ -100,7 +100,14 @@ export fn memcmp(lhs: [*]const u8, rhs: [*]const u8, count: usize) c_int {
     return 0;
 }
 
-export fn memchr(ptr: [*]u8, ch: c_int, count: usize) ?*u8 {
+test "memcmp" {
+    assert(memcmp(c"aaa", c"aaa", 3) == 0);
+    assert(memcmp(c"aab", c"aac", 3) == -1);
+    assert(memcmp(c"aac", c"aab", 3) == 1);
+}
+
+// NOTE: Return code for memchr is actually a non-const void*.
+export fn memchr(ptr: [*]const u8, ch: c_int, count: usize) ?*const u8 {
     var i: usize = 0;
     while (i < count) : (i += 1) {
         if (ptr[i] == @intCast(u8, ch)) {
@@ -111,7 +118,12 @@ export fn memchr(ptr: [*]u8, ch: c_int, count: usize) ?*u8 {
     return null;
 }
 
-// low-level string functions
+test "memchr" {
+    const p = c"aaaab";
+    assert(memchr(p, 'b', 5) == &p[4]);
+    assert(memchr(p, 'a', 5) == &p[0]);
+    assert(memchr(p, 'c', 2) == null);
+}
 
 export fn strcpy(noalias dest: [*]u8, noalias src: [*]const u8) [*]u8 {
     var i: usize = 0;
@@ -120,6 +132,13 @@ export fn strcpy(noalias dest: [*]u8, noalias src: [*]const u8) [*]u8 {
     }
     dest[i] = 0;
     return dest;
+}
+
+test "strcpy" {
+    var buffer: [8]u8 = undefined;
+
+    _ = strcpy(buffer[0..].ptr, c"abc");
+    assert(std.mem.eql(u8, buffer[0..4], "abc\x00"));
 }
 
 export fn strncpy(noalias dest: [*]u8, noalias src: [*]const u8, count: usize) [*]u8 {
@@ -133,15 +152,22 @@ export fn strncpy(noalias dest: [*]u8, noalias src: [*]const u8, count: usize) [
     return dest;
 }
 
+test "strncpy" {
+    var buffer: [4]u8 = undefined;
+
+    _ = strncpy(buffer[0..].ptr, c"abc", 4);
+    assert(std.mem.eql(u8, buffer[0..4], "abc\x00"));
+
+    _ = strncpy(buffer[0..].ptr, c"abcdef", 4);
+    assert(std.mem.eql(u8, buffer[0..4], "abcd"));
+}
+
 export fn strcat(noalias dest: [*]u8, noalias src: [*]const u8) [*]u8 {
     var i: usize = 0;
     while (dest[i] != 0) : (i += 1) {}
 
     var j: usize = 0;
-    while (src[j] != 0) : ({
-        j += 1;
-        i += 1;
-    }) {
+    while (src[j] != 0) : (j += 1) {
         dest[i + j] = src[j];
     }
     dest[i + j] = 0;
@@ -149,20 +175,35 @@ export fn strcat(noalias dest: [*]u8, noalias src: [*]const u8) [*]u8 {
     return dest;
 }
 
+test "strcat" {
+    var buffer: [8]u8 = undefined;
+    buffer[0] = 'x';
+    buffer[1] = 0;
+
+    _ = strcat(buffer[0..].ptr, c"abc");
+    assert(std.mem.eql(u8, buffer[0..5], "xabc\x00"));
+}
+
 export fn strncat(noalias dest: [*]u8, noalias src: [*]const u8, count: usize) [*]u8 {
     var i: usize = 0;
     while (dest[i] != 0) : (i += 1) {}
 
     var j: usize = 0;
-    while (src[j] != 0 and j < count) : ({
-        j += 1;
-        i += 1;
-    }) {
+    while (src[j] != 0 and j < count) : (j += 1) {
         dest[i + j] = src[j];
     }
     dest[i + j] = 0;
 
     return dest;
+}
+
+test "strncat" {
+    var buffer: [8]u8 = undefined;
+    buffer[0] = 'x';
+    buffer[1] = 0;
+
+    _ = strncat(buffer[0..].ptr, c"abc", 2);
+    assert(std.mem.eql(u8, buffer[0..4], "xab\x00"));
 }
 
 export fn strcmp(lhs: [*]const u8, rhs: [*]const u8) c_int {
@@ -184,6 +225,12 @@ export fn strcmp(lhs: [*]const u8, rhs: [*]const u8) c_int {
     }
 }
 
+test "strcmp" {
+    assert(strcmp(c"abc", c"abc") == 0);
+    assert(strcmp(c"aaa", c"cbb") == -1);
+    assert(strcmp(c"cbb", c"aaa") == 1);
+}
+
 export fn strncmp(lhs: [*]const u8, rhs: [*]const u8, count: usize) c_int {
     var i: usize = 0;
     while (lhs[i] != 0 and rhs[i] != 0 and i < count) : (i += 1) {
@@ -192,18 +239,26 @@ export fn strncmp(lhs: [*]const u8, rhs: [*]const u8, count: usize) c_int {
         } else if (lhs[i] < rhs[i]) {
             return -1;
         }
+    } else {
+        return 0;
     }
 
-    if (lhs[i] == rhs[i]) {
+    if (lhs[i] == 0 and rhs[i] == 0) {
         return 0;
-    } else if (lhs[i] > rhs[i]) {
+    } else if (rhs[i] == 0) {
         return 1;
     } else {
         return -1;
     }
 }
 
-// TODO: Actually returns a non-const ref
+test "strncmp" {
+    assert(strncmp(c"abc", c"abc", 5) == 0);
+    assert(strncmp(c"aaa", c"cbb", 3) == -1);
+    assert(strncmp(c"aab", c"aaa", 2) == 0);
+}
+
+// NOTE: Actually returns a non-const ref
 export fn strchr(str: [*]const u8, ch: c_int) ?*const u8 {
     var i: usize = 0;
     while (str[i] != 0) : (i += 1) {
@@ -217,6 +272,13 @@ export fn strchr(str: [*]const u8, ch: c_int) ?*const u8 {
     }
 
     return null;
+}
+
+test "strchr" {
+    const p = c"aaaab";
+    assert(strchr(p, 'b') == &p[4]);
+    assert(strchr(p, 'a') == &p[0]);
+    assert(strchr(p, 'c') == null);
 }
 
 export fn strlen(str: [*]const u8) usize {
