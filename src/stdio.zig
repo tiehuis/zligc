@@ -69,6 +69,14 @@ export fn rename(old_filename: ?[*]const u8, new_filename: ?[*]const u8) c_int {
     }
 }
 
+export fn remove(pathname: ?[*]const u8) c_int {
+    if (std.os.deleteFile(allocator, cstr.toSliceConst(pathname.?))) |_| {
+        return 0;
+    } else |err| {
+        return -1;
+    }
+}
+
 // File positioning
 
 export fn fseek(stream: ?*c.FILE, offset: c_long, origin: c_int) c_int {

@@ -14,7 +14,6 @@
  - getenv
  - strtod
  - snprintf
- - remove
  - tmpnam
  - clock
  - time
