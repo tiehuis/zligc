@@ -281,3 +281,12 @@ export fn lldiv(x: c_longlong, y: c_longlong) lldiv_t {
 // NOTE: Omitted multibyte functions
 
 // NOTE: Ommitted posix/gnu extension functions
+
+export fn getenv(name: [*]const u8) ?[*]const u8 {
+    // TODO: non-posix environment
+    if (std.os.getEnvPosix(std.cstr.toSliceConst(name))) |ok| {
+        return ok[0..].ptr;
+    } else {
+        return null;
+    }
+}

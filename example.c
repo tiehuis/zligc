@@ -24,6 +24,10 @@ int main(void)
     // Will warn right now since we don't have an exportable c_char type
     puts("Hello, from Zig!");
 
+    const char *senv = getenv("HOME");
+    puts("env HOME:");
+    puts(senv);
+
     test_fprintf(stdout, "%s, hello 0x%x %d %c %p %u %f %e\n");
 
     char buf[128];
