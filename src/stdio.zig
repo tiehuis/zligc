@@ -49,6 +49,10 @@ export fn fopen(filename: [*]const u8, mode: [*]const u8) ?*c.FILE {
     return @ptrCast(?*c.FILE, fd);
 }
 
+export fn fopen64(filename: [*]const u8, mode: [*]const u8) ?*c.FILE {
+    return fopen(filename, mode);
+}
+
 export fn fclose(stream: ?*c.FILE) c_int {
     var fd = readOpaqueHandle(stream);
     fd.close();
@@ -259,5 +263,29 @@ export fn test_fprintf(stream: ?*c.FILE, noalias fmt: [*]const u8) c_int {
         }
     }
 
+    return 0;
+}
+
+export fn clearerr(stream: ?*c.FILE) void {
+    // TODO: actually clear streams
+}
+
+export fn feof(stream: ?*c.FILE) c_int {
+    // TODO: actually check eof
+    return 0;
+}
+
+export fn ferror(stream: ?*c.FILE) c_int {
+    // TODO: check if error has occured
+    return 0;
+}
+
+export fn fflush(stream: ?*c.FILE) c_int {
+    // TODO: actually flush the stream
+    return 0;
+}
+
+export fn setvbuf(stream: ?*c.FILE, buf: [*]u8, mode: c_int, size: usize) c_int {
+    // TODO:
     return 0;
 }
