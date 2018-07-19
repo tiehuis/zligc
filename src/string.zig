@@ -1,8 +1,19 @@
 // Corresponds to <string.h>
 
+const builtin = @import("builtin");
 const std = @import("std");
+const assert = std.debug.assert;
 
-export fn memcpy(noalias dest: [*]u8, noalias src: [*]const u8, count: usize) [*]u8 {
+inline fn copyBackward(dest: [*]u8, src: [*]const u8, count: usize) [*]u8 {
+    var ri: usize = 0;
+    while (ri < count) : (ri += 1) {
+        const i = count - ri - 1;
+        dest[i] = src[i];
+    }
+    return dest;
+}
+
+inline fn copyForward(dest: [*]u8, src: [*]const u8, count: usize) [*]u8 {
     var i: usize = 0;
     while (i < count) : (i += 1) {
         dest[i] = src[i];
@@ -10,21 +21,70 @@ export fn memcpy(noalias dest: [*]u8, noalias src: [*]const u8, count: usize) [*
     return dest;
 }
 
-export fn memmove(dest: [*]u8, src: [*]const u8, count: usize) [*]u8 {
-    // TODO: Should handle overlap.
-    var i: usize = 0;
-    while (i < count) : (i += 1) {
-        dest[i] = src[i];
+comptime {
+    // These are implicitly defined when compiling tests.
+    if (!builtin.is_test) {
+        @export("memcpy", memcpy, builtin.GlobalLinkage.Strong);
+        @export("memmove", memmove, builtin.GlobalLinkage.Strong);
+        @export("memset", memset, builtin.GlobalLinkage.Strong);
     }
-    return dest;
 }
 
-export fn memset(dest: [*]u8, ch: c_int, count: usize) [*]u8 {
+extern fn memcpy(noalias dest: [*]u8, noalias src: [*]const u8, count: usize) [*]u8 {
+    return @inlineCall(copyForward, dest, src, count);
+}
+
+test "memcpy" {
+    var a = " " ** 3;
+    _ = memcpy(a[0..].ptr, c"abc", 3);
+    assert(std.mem.eql(u8, a[0..3], "abc"));
+}
+
+extern fn memmove(dest: [*]u8, src: [*]const u8, count: usize) [*]u8 {
+    const dest_p = @ptrToInt(dest);
+    const src_p = @ptrToInt(src);
+
+    if (dest_p == src_p) {
+        return dest;
+    }
+
+    if (dest_p + count <= src_p or src_p + count <= dest_p) {
+        return memcpy(dest, src, count);
+    }
+
+    if (dest_p < src_p) {
+        return copyForward(dest, src, count);
+    } else {
+        return copyBackward(dest, src, count);
+    }
+}
+
+test "memmove" {
+    var c = "abcdefg";
+    _ = memmove(c[0..].ptr, c"def", 3);
+    assert(std.mem.eql(u8, c[0..7], "defdefg"));
+
+    var a = "abcdefg";
+    _ = memmove(a[0..].ptr, a[2..].ptr, 3);
+    assert(std.mem.eql(u8, a[0..7], "cdedefg"));
+
+    var b = "abcdefg";
+    _ = memmove(b[2..].ptr, b[0..].ptr, 3);
+    assert(std.mem.eql(u8, b[0..7], "ababcfg"));
+}
+
+extern fn memset(dest: [*]u8, ch: c_int, count: usize) [*]u8 {
     var i: usize = 0;
     while (i < count) : (i += 1) {
         dest[i] = @intCast(u8, ch);
     }
     return dest;
+}
+
+test "memset" {
+    var a = " " ** 7;
+    _ = memset(a[0..].ptr, 'z', 7);
+    //assert(std.mem.eql(u8, a[0..7], "zzzzzzz"));
 }
 
 export fn memcmp(lhs: [*]const u8, rhs: [*]const u8, count: usize) c_int {
@@ -163,4 +223,10 @@ export fn strlen(str: [*]const u8) usize {
     var i: usize = 0;
     while (str[i] != 0) : (i += 1) {}
     return i;
+}
+
+test "strlen" {
+    assert(strlen(c"") == 0);
+    assert(strlen(c"a") == 1);
+    assert(strlen(c"abcdefgh") == 8);
 }

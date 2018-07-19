@@ -2,8 +2,6 @@
 
 const math = @import("std").math;
 
-// NOTE: Require macros for the type-generic functions in a header.
-
 export fn acosf(x: f32) f32 {
     return math.acos(x);
 }

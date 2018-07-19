@@ -20,9 +20,7 @@ export var stdout = &stdout_file;
 var stderr_file: File = undefined;
 export var stderr = &stderr_file;
 
-var allocator = std.debug.global_allocator;
-
-var resolved: u8 = 0;
+var allocator = &@import("allocator.zig").fixed.allocator;
 
 fn initStreams() void {
     @setCold(true);
@@ -31,6 +29,8 @@ fn initStreams() void {
     stdout_file = std.io.getStdOut() catch unreachable;
     stderr_file = std.io.getStdErr() catch unreachable;
 }
+
+var resolved: u8 = 0;
 
 inline fn readOpaqueHandle(handle: ?*c.FILE) *File {
     // TODO: workaround since passing resolved directly to @cmpxchgStrong treats it as comptime
@@ -150,4 +150,87 @@ export fn fputs(str: ?[*]const u8, stream: ?*c.FILE) c_int {
 
 export fn puts(str: [*]const u8) c_int {
     return fputs(str, @ptrCast(?*c.FILE, stdout));
+}
+
+// TODO: varargs support (access stack directly)
+// TODO: Write directly to stream instead of buffer
+export fn test_fprintf(stream: ?*c.FILE, noalias fmt: [*]const u8) c_int {
+    var buffer: [64]u8 = undefined;
+
+    var i: usize = 0;
+    while (fmt[i] != 0) {
+        var ch = fmt[i];
+        i += 1;
+
+        if (ch != '%') {
+            _ = fputc(ch, stream);
+            continue;
+        }
+
+        // c == %
+        ch = fmt[i];
+        i += 1;
+
+        switch (ch) {
+            'd', 'i' => {
+                const dummy: c_int = -5;
+                const slice = std.fmt.bufPrint(buffer[0..], "{}", dummy) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            'u' => {
+                const dummy: c_uint = 5;
+                const slice = std.fmt.bufPrint(buffer[0..], "{}", dummy) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            'x', 'X' => {
+                const dummy: c_uint = 5;
+                const slice = std.fmt.bufPrint(buffer[0..], "{x}", dummy) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            'e', 'E' => {
+                const dummy: f32 = -5.3;
+                const slice = std.fmt.bufPrint(buffer[0..], "{e}", dummy) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            'f', 'F' => {
+                const dummy: f32 = 5.3;
+                const slice = std.fmt.bufPrint(buffer[0..], "{.5}", dummy) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            'c' => {
+                const dummy: u8 = 'A';
+                const slice = std.fmt.bufPrint(buffer[0..], "{c}", dummy) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            's' => {
+                const dummy: [*]const u8 = c"dummy";
+                _ = fwrite(dummy, 1, std.cstr.len(dummy), stream);
+            },
+
+            'p' => {
+                const dummy: usize = @ptrToInt(&buffer);
+                const slice = std.fmt.bufPrint(buffer[0..], "{x}", dummy) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            '%' => {
+                _ = fputc('%', stream);
+            },
+
+            else => {
+                const slice = std.fmt.bufPrint(buffer[0..], "(unknown: %{c})", ch) catch unreachable;
+                _ = fwrite(slice.ptr, 1, slice.len, stream);
+            },
+
+            0 => break,
+        }
+    }
+
+    return 0;
 }

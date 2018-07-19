@@ -5,7 +5,7 @@ A libc implementation in zig.
 To build a static libc implementation:
 
 ```
-zig build
+make
 ```
 
 Confirm the exported symbols with `readelf -s libc.a`.
