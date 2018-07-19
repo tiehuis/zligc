@@ -28,6 +28,9 @@ int main(void)
         fputs(buf, stdout);
     }
 
+    FILE *fd = fopen("test.txt", "r");
+    fd = freopen(NULL, "w", fd);
+
     /*
     //srand(0);
 

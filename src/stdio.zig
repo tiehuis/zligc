@@ -53,6 +53,23 @@ export fn fopen64(filename: [*]const u8, mode: [*]const u8) ?*c.FILE {
     return fopen(filename, mode);
 }
 
+export fn freopen(maybe_filename: ?[*]const u8, mode: [*]const u8, stream: ?*c.FILE) ?*c.FILE {
+    if (maybe_filename) |filename| {
+        // TODO: Probably a better way of doing this.
+        var fd = readOpaqueHandle(stream);
+        fd.close();
+
+        fd.* = File.openWrite(allocator, cstr.toSliceConst(filename)) catch return null;
+        return @ptrCast(?*c.FILE, fd);
+    } else {
+        @panic("TODO: reopen existing stream with new mode");
+    }
+}
+
+export fn freopen64(maybe_filename: ?[*]const u8, mode: [*]const u8, stream: ?*c.FILE) ?*c.FILE {
+    return freopen(maybe_filename, mode, stream);
+}
+
 export fn fclose(stream: ?*c.FILE) c_int {
     var fd = readOpaqueHandle(stream);
     fd.close();
