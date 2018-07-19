@@ -1,17 +1,12 @@
 # lua-5.3.4 linking
 
- - __stack_chk_fail
- - strerror
  - fprintf
- - __ctype_b_loc
  - longjmp
  - setjmp
  - tmpfile64
- - localeconv
  - ungetc
  - fmod
  - getenv
  - strtod
  - snprintf
  - tmpnam
- - setlocale

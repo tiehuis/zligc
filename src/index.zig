@@ -8,6 +8,7 @@ pub use @import("stdio.zig");
 pub use @import("stdlib.zig");
 pub use @import("string.zig");
 pub use @import("time.zig");
+pub use @import("locale.zig");
 
 const builtin = @import("builtin");
 const std = @import("std");

@@ -385,3 +385,9 @@ test "strcspn" {
 export fn strcoll(lhs: [*]const u8, rhs: [*]const u8) c_int {
     return strcmp(lhs, rhs);
 }
+
+// NOTE: Returns const char* instead of non-const as declared.
+export fn strerror(errnum: c_int) [*]const u8 {
+    // TODO: Add conversions for the remaining.
+    return c"Unknown error xxx";
+}

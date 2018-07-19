@@ -59,3 +59,14 @@ export fn tolower(c: c_int) c_int {
 export fn toupper(c: c_int) c_int {
     return if (islower(c) != 0) (c & 0x5f) else c;
 }
+
+// Characteristics for each character in the current charset.
+// These rae used in ctype.
+
+// TODO: Correct values.
+const table = []u16{0} ** 384;
+const ptable = &table[128];
+
+export fn __ctype_b_loc() *const *const u16 {
+    return ptable;
+}
