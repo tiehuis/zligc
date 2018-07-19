@@ -121,6 +121,10 @@ export fn getc(stream: ?*c.FILE) c_int {
     return fgetc(stream);
 }
 
+export fn _IO_getc(stream: ?*c._IO_FILE) c_int {
+    return getc(stream);
+}
+
 export fn getchar() c_int {
     return fgetc(@ptrCast(?*c.FILE, stdin));
 }
@@ -234,3 +238,4 @@ export fn test_fprintf(stream: ?*c.FILE, noalias fmt: [*]const u8) c_int {
 
     return 0;
 }
+

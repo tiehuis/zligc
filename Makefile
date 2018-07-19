@@ -1,12 +1,14 @@
+SRCS := $(wildcard src/*.zig)
+
 all: example
 
-lib/libc.a:
+lib:
 	rm -f lib/libc.a
 	zig build-obj src/index.zig --name libc --output-h zig-cache/libc.h
 	ar qc lib/libc.a zig-cache/libc.o zig-cache/compiler_rt.o
 	ranlib lib/libc.a
 
-example: example.c lib/libc.a
+example: lib
 	gcc -Wall -Wextra -static -nostdlib -g \
 		-Iinclude \
 		example.c -o example \
@@ -18,4 +20,4 @@ test:
 clean:
 	rm -f example lib/libc.a
 
-.PHONY: test clean
+.PHONY: lib example test clean

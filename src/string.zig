@@ -281,6 +281,40 @@ test "strchr" {
     assert(strchr(p, 'c') == null);
 }
 
+// Slow, O(n*m) version
+export fn strstr(haystack: [*]const u8, needle: [*]const u8) ?*const u8 {
+    const haystack_len = strlen(haystack);
+    const needle_len = strlen(needle);
+
+    if (needle_len > haystack_len) {
+        return null;
+    }
+
+    var i: usize = 0;
+    while (i < haystack_len - needle_len + 1) : (i += 1) {
+        var j: usize = 0;
+        while (j < needle_len) : (j += 1) {
+            if (haystack[i + j] != needle[j]) {
+                break;
+            }
+        } else {
+            return &haystack[i];
+        }
+    }
+
+    return null;
+}
+
+test "strstr" {
+    const p = c"aabaacaadaaezzzaaf";
+    assert(strstr(p, c"aab") == &p[0]);
+    assert(strstr(p, c"aac") == &p[3]);
+    assert(strstr(p, c"a") == &p[0]);
+    assert(strstr(p, c"yyy") == null);
+    assert(strstr(p, c"aafe") == null);
+    assert(strstr(p, c"aaaaaaaaaaaaaaaaaaaaaaaaa") == null);
+}
+
 export fn strlen(str: [*]const u8) usize {
     var i: usize = 0;
     while (str[i] != 0) : (i += 1) {}
@@ -291,4 +325,63 @@ test "strlen" {
     assert(strlen(c"") == 0);
     assert(strlen(c"a") == 1);
     assert(strlen(c"abcdefgh") == 8);
+}
+
+export fn strpbrk(dest: [*]const u8, breakset: [*]const u8) ?*const u8 {
+    var i: usize = 0;
+    while (dest[i] != 0) : (i += 1) {
+        if (strchr(breakset, dest[i]) != null) {
+            return &dest[i];
+        }
+    }
+
+    return null;
+}
+
+test "strpbrk" {
+    const p = c"abc,def ghi!";
+    assert(strpbrk(p, c", !") == &p[3]);
+    assert(strpbrk(p, c"! ,") == &p[3]);
+    assert(strpbrk(p, c"! ") == &p[7]);
+    assert(strpbrk(p, c"z") == null);
+}
+
+export fn strspn(dest: [*]const u8, accept: [*]const u8) usize {
+    var i: usize = 0;
+
+    while (dest[i] != 0) : (i += 1) {
+        if (strchr(accept, dest[i]) == null) {
+            break;
+        }
+    }
+
+    return i;
+}
+
+test "strspn" {
+    assert(strspn(c"12abcd", c"123456789") == 2);
+    assert(strspn(c"12abcd", c"abcdefg") == 0);
+}
+
+export fn strcspn(dest: [*]const u8, reject: [*]const u8) usize {
+    var i: usize = 0;
+
+    while (dest[i] != 0) : (i += 1) {
+        if (strchr(reject, dest[i]) != null) {
+            break;
+        }
+    }
+
+    return i;
+}
+
+test "strcspn" {
+    assert(strcspn(c"abcd12", c"123456789") == 4);
+    assert(strcspn(c"12abcd", c"abcdefg") == 2);
+    assert(strcspn(c"a12abcd", c"abcdefg") == 0);
+}
+
+// TODO: depend on LC_COLLATE
+export fn strcoll(lhs: [*]const u8, rhs: [*]const u8) c_int {
+    return strcmp(lhs, rhs);
 }
