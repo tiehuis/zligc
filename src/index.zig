@@ -10,6 +10,8 @@ pub use @import("string.zig");
 pub use @import("time.zig");
 pub use @import("locale.zig");
 
+pub use @import("crt.zig");
+
 const builtin = @import("builtin");
 const std = @import("std");
 
