@@ -14,8 +14,4 @@
  - strtod
  - snprintf
  - tmpnam
- - clock
- - time
- - gmtime
- - localtime
- - strftime
+ - setlocale

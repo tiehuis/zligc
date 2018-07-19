@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 #include <errno.h>
 
 extern int test_fprintf(FILE *stream, const char *fmt);
@@ -17,6 +18,9 @@ uint8_t get_value(void)
 
 int main(void)
 {
+    time_t s = time(NULL);
+    (void) s;
+
     // Will warn right now since we don't have an exportable c_char type
     puts("Hello, from Zig!");
 
